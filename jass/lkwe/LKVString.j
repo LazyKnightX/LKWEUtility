@@ -8,7 +8,7 @@
  *   PickVStringValue(string vstring, integer begin, integer end) -> integer
  */
 
-library VStringUtility
+library LKVString
 {
   // field
     private string VSTRINGCHARMAP = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()`~-_=+[]{}\\/|?;:'\",.<>";
