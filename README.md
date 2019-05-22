@@ -1,10 +1,12 @@
 # LKWEUtility [开发中]
 Lazy Knight 的魔兽地图编辑器脚本脚手架，用于制作魔兽争霸III以及其资料片冰封王座的MOD（魔兽地图）。
 
+本框架适用于1.31.8以上版本的YDWE，并且需要用户有安装对应DzAPI、11API等库。
+
 目前还在开发中状态，包含各种BUG，请勿使用。
 
 ## VString
-Value String，VString 是一个将整数压缩为字符串的工具，本工具目前可以将小于9000的整数压缩到2个字符中。
+Value String，VString 是一个将整数压缩为字符串的工具，本工具目前可以将小于（不包含“等于”）8649（93^2）的整数压缩到2个字符中。
 
 TODO：VString的StringMap并不完整，还能够增加更多字符。
 

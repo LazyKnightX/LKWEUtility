@@ -1,3 +1,6 @@
+#ifndef LKStringIncluded
+#define LKStringIncluded
+
 /**
  * StringUtility.j
  *
@@ -6,6 +9,8 @@
  *   ModifyStringChar(string source, integer pos, string char) -> string
  *   ReplaceStringPiece(string source, integer start, integer end, string value) -> string
  */
+
+ //! zinc
 
 library LKString
 {
@@ -28,3 +33,7 @@ library LKString
         return source == null || source == "" || StringLength(source) == 0;
     }
 }
+
+//! endzinc
+
+#endif

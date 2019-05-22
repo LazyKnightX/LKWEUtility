@@ -1,3 +1,6 @@
+#ifndef LKVStringIncluded
+#define LKVStringIncluded
+
 /**
  * VString.j
  *
@@ -8,11 +11,13 @@
  *   PickVStringValue(string vstring, integer begin, integer end) -> integer
  */
 
+//! zinc
+
 library LKVString
 {
   // field
-    private string VSTRINGCHARMAP = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()`~-_=+[]{}\\/|?;:'\",.<>";
-    private integer VSTRINGCHARMAPLENGTH; // length: 95
+    private string VSTRINGCHARMAP = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()`~-_=+[]{}\\/|?;:'\",.<>"; // CHARMAP中不含"0"，但"0"会在实际使用中作为最低值的标记
+    private integer VSTRINGCHARMAPLENGTH; // length: 93 (\\和\"对应单个字符)
   // converter
     private function ConvertIntegerToVChar(integer value) -> string
     {
@@ -130,9 +135,26 @@ library LKVString
       return value;
     }
   // function
+    private function GetMaxVChar() -> string
+    {
+      integer pos = VSTRINGCHARMAPLENGTH - 1; // -1: 最大的符号会用于进一，因此使用倒数第二个符号。
+      return SubStringBJ(VSTRINGCHARMAP, pos, pos);
+    }
     public function PickVStringValue(string vstring, integer begin, integer end) -> integer
     {
       return ConvertVStringToInteger(SubStringBJ(vstring, begin, end));
+    }
+    public function GetMaxVStringValueOfLength(integer length) -> string
+    {
+      string vstr = "";
+      string maxchar = GetMaxVChar();
+
+      while (StringLength(vstr) < length)
+      {
+        vstr = vstr + maxchar;
+      }
+
+      return vstr;
     }
   // init
     #ifdef DEBUG
@@ -164,3 +186,7 @@ library LKVString
       #endif
     }
 }
+
+//! endzinc
+
+#endif

@@ -1,0 +1,2 @@
+[TriggerCategories]
+TC_LKSERVER=@ LK服务端,ReplaceableTextures\WorldEditUI\Actions-AI

@@ -1,0 +1,15 @@
+[SetPlayerServerVStringPiece]
+title = "设置玩家储存在服务器上指定键的服务器存档数据"
+description = "设置玩家 ${player} 储存在键 ${key} ，位于第 ${pos} 、长度为 ${length} 储存位的服务器数据的值为 ${value}"
+comment = "如：(玩家1)的(Equip)键的第3位开始，长度为2的服务器储存位。注：这里的 pos 可以超过63（DzAPI的字符串长度限制）位，但 length 不建议超过4位。注：value的最大值为 (93^length) - 1。具体问题可直接询问。"
+category = TC_LKSERVER
+[[.args]]
+type = player
+[[.args]]
+type = string
+[[.args]]
+type = integer
+[[.args]]
+type = integer
+[[.args]]
+type = integer

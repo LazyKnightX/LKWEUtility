@@ -1,3 +1,11 @@
+#ifndef LKDataIncluded
+#define LKDataIncluded
+
+#include "lkwe/LKString.j"
+#include "lkwe/LKVString.j"
+
+//! zinc
+
 library LKData requires LKString, LKVString
 {
     public hashtable ht = InitHashtable();
@@ -30,3 +38,7 @@ library LKData requires LKString, LKVString
     }
     */
 }
+
+//! endzinc
+
+#endif
