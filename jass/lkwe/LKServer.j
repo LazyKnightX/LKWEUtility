@@ -2,36 +2,100 @@
 // #define ServerType 1
 
 // 参数说明：
-// ServerType: 1 - DzAPI
+// ServerType: 1 - DzAPI, 2 - GameCache(TODO), 3 - 11API(TODO), 4 - SyAPI(TODO)
 
-library LKServer requires LKString
+#ifndef ServerType
+    [Error] Should Define "ServerType".
+#endif
+
+library LKServer requires LKData
 {
-  function GetPlayerServerString(player whichPlayer, string key) -> string
-  {
-    #if ServerType == 1
-      return DzAPI_Map_GetServerValue(whichPlayer, "S" + key);
-    #endif
-  }
+    private function GetPlayerCacheStringKey(player whichPlayer) -> integer
+    {
+        return StringHash("PlayerCacheString" + I2S(GetPlayerId(whichPlayer)));
+    }
+    private function GetPlayerCacheString(player whichPlayer, string key) -> string
+    {
+        return LoadStr(ht, GetPlayerCacheStringKey(whichPlayer), StringHash(key));
+    }
+    private function SetPlayerCacheString(player whichPlayer, string key, string value)
+    {
+        SaveStr(ht, GetPlayerCacheStringKey(whichPlayer), StringHash(key), value);
+    }
+    private function HasPlayerCacheString(player whichPlayer, string key) -> boolean
+    {
+        string value = GetPlayerCacheString(whichPlayer, key); 
+        return value != null && StringLength(value) > 0;
+    }
 
-  function SetPlayerServerString(player whichPlayer, string key, string value) -> nothing
-  {
-    #if ServerType == 1
-      DzAPI_Map_SaveServerValue(whichPlayer, "S" + key, value);
-    #endif
-  }
+    private function GetPlayerServerDefaultVString() -> string
+    {
+        return "000000000000000000000000000000000000000000000000000000000000000";
+    }
 
-  function GetPlayerServerStringPiece(player whichPlayer, string key, integer start, integer end) -> string
-  {
-    string str, piece;
-    str = GetPlayerServerString(whichPlayer, key);
-    piece = SubStringBJ(str, start, end);
-    return piece;
-  }
+    public function GetPlayerServerString(player whichPlayer, string key) -> string
+    {
+        string value;
 
-  function SetPlayerServerStringPiece(player whichPlayer, string key, integer start, integer end, string value) -> nothing
-  {
-    string str = GetPlayerServerString(whichPlayer, key);
-    string newStr = ReplaceStringPiece(str, value, start, end);
-    SetPlayerServerString(whichPlayer, key, value);
-  }
+        if (HasPlayerCacheString(whichPlayer, key) == false)
+        {
+            #if ServerType == 1
+                value = DzAPI_Map_GetServerValue(whichPlayer, "S" + key);
+            #endif
+
+            SetPlayerCacheString(whichPlayer, key, value);
+        }
+
+        return GetPlayerCacheString(whichPlayer, key);
+    }
+    public function SetPlayerServerString(player whichPlayer, string key, string value)
+    {
+        #if ServerType == 1
+            DzAPI_Map_SaveServerValue(whichPlayer, "S" + key, value);
+        #endif
+
+        SetPlayerCacheString(whichPlayer, key, value);
+    }
+    public function GetPlayerServerStringOrDefault(player whichPlayer, string key, string default) -> string
+    {
+        string value;
+
+        value = GetPlayerServerString(whichPlayer, key);
+
+        if (IsStringNullOrEmpty(value))
+        {
+            SetPlayerServerString(whichPlayer, key, default);
+
+            return default;
+        }
+        else
+        {
+            return value;
+        }
+    }
+
+    public function GetPlayerServerVStringPiece(player whichPlayer, string key, integer pos, integer length) -> integer
+    {
+        string value, piece;
+        integer start, end;
+
+        start = pos;
+        end = start + (length - 1);
+        value = GetPlayerServerStringOrDefault(whichPlayer, key, GetPlayerServerDefaultVString());
+        piece = SubStringBJ(value, start, end);
+
+        return ConvertVStringToInteger(piece);
+    }
+    public function SetPlayerServerVStringPiece(player whichPlayer, string key, integer pos, integer length, integer value)
+    {
+        string vstr, newVStr;
+        integer start, end;
+
+        start = pos;
+        end = start + (length - 1);
+        vstr = GetPlayerServerStringOrDefault(whichPlayer, key, GetPlayerServerDefaultVString());
+        newVStr = ReplaceStringPiece(vstr, start, end, ConvertIntegerToVString(value, length));
+
+        SetPlayerServerString(whichPlayer, key, newVStr);
+    }
 }
