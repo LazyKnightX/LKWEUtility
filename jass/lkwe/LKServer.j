@@ -2,11 +2,10 @@
 #define LKServerIncluded
 
 #include "lkwe/LKData.j"
-#include "DzAPI.j"
 
 // 参数：
 // #define ServerType 1
-// #define ServerStringMaxLength 63
+//     #define ServerStringMaxLength 63
 
 // 参数说明：
 // ServerType: 1 - DzAPI, 2 - GameCache(TODO), 3 - 11API(TODO), 4 - SyAPI(TODO)
@@ -15,8 +14,14 @@
     [Error] Should Define "ServerType".
 #endif
 
-#ifndef ServerStringMaxLength
-    [Error] Should Define "ServerStringMaxLength".
+#if ServerType == 1
+
+    #ifndef ServerStringMaxLength
+        [Error] Should Define "ServerStringMaxLength".
+    #endif
+
+    #include "DzAPI.j"
+
 #endif
 
 //! zinc
