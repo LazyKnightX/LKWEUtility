@@ -4,11 +4,13 @@
 /**
  * VString.j
  *
- * Version: 1.0.0
  * Public:
  *   ConvertIntegerToVString(integer value, integer length) -> string
  *   ConvertVStringToInteger(string vstring) -> integer
  *   PickVStringValue(string vstring, integer begin, integer end) -> integer
+ * Todo:
+ *   Optimize debug info and overflow protection.
+ *   Backward compatible feature implement.
  */
 
 //! zinc
@@ -17,11 +19,17 @@ library LKVString
 {
   // field
     private string VSTRINGCHARMAP = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()`~-_=+[]{}\\/|?;:'\",.<>"; // CHARMAP中不含"0"，但"0"会在实际使用中作为最低值的标记
-    private integer VSTRINGCHARMAPLENGTH; // length: 93 (\\和\"对应单个字符)
+    private integer VSTRINGCHARMAPLENGTH; // length: 93+1 (\\和\"对应单个字符，此外需要补充没有手动填入的“0”)
   // converter
     private function ConvertIntegerToVChar(integer value) -> string
     {
       string vchar;
+
+      // Prevent Overflow
+      if (value > VSTRINGCHARMAPLENGTH)
+      {
+        value = VSTRINGCHARMAPLENGTH;
+      }
 
       if (value == 0)
       {
@@ -53,22 +61,28 @@ library LKVString
 
       return 0;
     }
+    // length: should better be equal or lower than 4.
     public function ConvertIntegerToVString(integer value, integer length) -> string
     {
       integer posValue[];
       integer charCount = 0;
       string vString = "";
       integer padZeroCount;
-      // integer maxValue = R2I(Pow(I2R(VSTRINGCHARMAPLENGTH), length) - 1); // (10^4 = 10000) and need (length = 4), so, maxValue should be (10000-1 = 9999) because (length = 4).
+      integer maxValue;
       integer index;
       string posChar;
 
-      // BJDebugMsg("maxValue:" + I2S(maxValue));
-      // if (value > maxValue)
-      // {
-      //   value = maxValue;
-      // }
-      // maxValue does not work if length is great like "63".
+      // length为5时maxValue就会超过INT32上限，因此防溢出功能只能在length小于或等于4时有效。
+      if (length <= 4)
+      {
+        maxValue = R2I(Pow(I2R(VSTRINGCHARMAPLENGTH), length) - 1); // (10^4 = 10000) and need (length = 4), so, maxValue should be (10000-1 = 9999) because (length = 4).
+        BJDebugMsg("maxValue:" + I2S(maxValue));
+        if (value > maxValue)
+        {
+          value = maxValue;
+        }
+      }
+      // maxValue does not work if length is too great, like 16, 32, 63, etc.. due to the INT32 limitation.
 
       while (true)
       {
@@ -180,8 +194,9 @@ library LKVString
     #endif
     private function onInit()
     {
-      VSTRINGCHARMAPLENGTH = StringLength(VSTRINGCHARMAP);
+      VSTRINGCHARMAPLENGTH = StringLength(VSTRINGCHARMAP) + 1; // +1: 缺失的“0”
       #ifdef DEBUG
+      BJDebugMsg("VSTRINGCHARMAPLENGTH: " + I2S(VSTRINGCHARMAPLENGTH));
       onInitDebug();
       #endif
     }

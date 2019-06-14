@@ -4,7 +4,6 @@
 /**
  * StringUtility.j
  *
- * Version: 1.0.0
  * Public:
  *   ModifyStringChar(string source, integer pos, string char) -> string
  *   ReplaceStringPiece(string source, integer start, integer end, string value) -> string

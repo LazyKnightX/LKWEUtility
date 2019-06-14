@@ -6,9 +6,15 @@
 // 参数：
 // #define ServerType 1
 //     #define ServerStringMaxLength 63
+// #define ServerDebugInfo
 
 // 参数说明：
 // ServerType: 1 - DzAPI, 2 - GameCache(TODO), 3 - 11API(TODO), 4 - SyAPI(TODO)
+//     ServerStringMaxLength: 服务器单一储存位字符串的最大长度
+// ServerDebugInfo: 是否显示服务器存档的Debug信息
+
+// Todo：
+// Support use "Byte" for storage.
 
 #ifndef ServerType
     [Error] Should Define "ServerType".
@@ -26,7 +32,7 @@
 
 //! zinc
 
-library LKServer requires LKData
+library LKServer requires LKData, LKVString
 {
     private function GetPlayerCacheStringKey(player whichPlayer) -> integer
     {
@@ -128,6 +134,7 @@ library LKServer requires LKData
 
             piece = piece1 + piece2;
 
+            #ifdef ServerDebugInfoServerDebugInfo
             BJDebugMsg("GetPlayerServerVStringPieceSource - needNextPage");
             BJDebugMsg("startPage: " + I2S(startPage));
             BJDebugMsg("endPage: " + I2S(endPage));
@@ -136,6 +143,7 @@ library LKServer requires LKData
             BJDebugMsg("piece1: " + piece1);
             BJDebugMsg("piece2: " + piece2);
             BJDebugMsg("piece: " + piece);
+            #endif
         }
         else
         {
@@ -161,8 +169,10 @@ library LKServer requires LKData
 
         if (StringLength(replace) > length)
         {
+            #ifdef ServerDebugInfoServerDebugInfo
             BJDebugMsg("错误：SetPlayerServerVStringPiece 存档失败，长度超过限制！已取消本次存档！");
             BJDebugMsg("key, pos, length, value: " + key + " " + I2S(pos) + I2S(length) + I2S(value));
+            #endif
             return;
         }
 
@@ -174,12 +184,14 @@ library LKServer requires LKData
             vstr1 = GetPlayerServerStringOrDefault(whichPlayer, key + "[" + I2S(startPage) + "]", GetPlayerServerDefaultVString());
             vstr2 = GetPlayerServerStringOrDefault(whichPlayer, key + "[" + I2S(endPage) + "]", GetPlayerServerDefaultVString());
 
+            #ifdef ServerDebugInfoServerDebugInfo
             BJDebugMsg("SetPlayerServerVStringPiece - needNextPage");
             BJDebugMsg("startPosInPage: " + I2S(startPosInPage));
             BJDebugMsg("ServerStringMaxLength: " + I2S(ServerStringMaxLength));
             BJDebugMsg("endPosInPage: " + I2S(endPosInPage));
             BJDebugMsg("replace1: " + replace1);
             BJDebugMsg("replace2: " + replace2);
+            #endif
             newVStr1 = ReplaceStringPiece(vstr1, startPosInPage, ServerStringMaxLength, replace1);
             newVStr2 = ReplaceStringPiece(vstr2, 1, endPosInPage, replace2);
 
